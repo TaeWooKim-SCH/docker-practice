@@ -21,3 +21,13 @@ docker run -it ubuntu # docker run [이미지 이름]
 - -p: 호스트와 컨테이너 포트를 연결하는 옵션
 - -v: 호스트와 컨테이너 디렉토리를 연결하는 옵션
 
+## Docker Container 관련 주요 명령
+- docker ps: 현재 실행 중인 컨테이너 확인
+- docker ps -a: 실행 중이지 않은 컨테이너까지 포함해서, 전체 컨테이너 확인
+- docker rm [삭제할 컨테이너 이름 또는 id]: 컨테이너 삭제
+- docker container stats: 실행 중인 컨테이너 사용 리소스 확인
+- docker exec [옵션] [컨테이너 이름 or id] [명령 인자]: 실행 중인 컨테이너에 명령 실행
+  - docker exec 같은 경우엔 백그라운드로 httpd 웹 서버 컨테이너를 띄워놓고 이 명령으로 접속해 명령을 실행할 수 있음
+  - 예시: docker exec -it apacheweb /bin/sh
+
+
