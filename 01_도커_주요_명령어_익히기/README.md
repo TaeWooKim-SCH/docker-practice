@@ -3,9 +3,9 @@
 ## 컨테이너 생성, 시작, 실행
 ---
 ```bash
-docker create ubuntu # docker create [원하는 컨테이너 이름] [이미지 이름]
-docker start my-ubuntu # docker start [컨테이너 이름]
-docker run -it ubuntu # docker run [이미지 이름]
+$ docker create ubuntu # docker create [원하는 컨테이너 이름] [이미지 이름]
+$ docker start my-ubuntu # docker start [컨테이너 이름]
+$ docker run -it ubuntu # docker run [이미지 이름]
 ```
 
 - create는 오로지 컨테이너 '생성만'
