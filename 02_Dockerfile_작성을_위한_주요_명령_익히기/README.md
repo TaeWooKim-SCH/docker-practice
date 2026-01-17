@@ -142,3 +142,38 @@ $ docker run -dit -p 9999:80 --name httpdweb2 --rm myweb2
 ```bash
 $ docker run -dit -p 9999:80 --name httpdweb2 --rm myweb2 /bin/sh -c httpd-foreground
 ```
+
+## ENTRYPOINT
+- ENTRYPOINT는 docker run 시에 함께 실행해야 하는 명령을 기입할 때 사용
+- CMD와 차이는 우선 순위가 ENTRYPOINT가 더 높음
+- CMD 명령에 덮어씌워지지 않기 위해 사용
+
+```bash
+FROM httpd:alpine
+
+LABEL maintainer="zop1234@hanmail.net"
+
+COPY ./2021_DEV_HTML /usr/local/apache2/htdocs
+
+ENTRYPOINT ["/bin/sh"]
+```
+- docker inspect 명령을 통해 확인해 보면 Entrypoint 부분에 들어가 있는 것을 확인할 수 있음
+
+
+## RUN
+- docker는 이미지 생성시, 각 단계를 layer로 나누어 작성함
+- RUN 명령은 이미지 생성 시, 일종의 layer를 만들 수 있는 명령으로, 보통 베이스 이미지에 패키지(프로그램)을 설치하여 새로운 이미지를 만들 때 많이 사용
+
+### 예: ubuntu 18.04 버전에 apache2를 설치 후 나만의 웹 복사 후 웹서버 구동
+
+```bash
+FROM ubuntu:18.04
+LABEL maintainer="zop1234@hanmail.net"
+
+RUN apt-get update
+RUN apt-get install -y apache2 apt-utils
+
+COPY ./2021_DEV_HTML /var/www/html/
+
+ENTRYPOINT ["usr/sbin/apache2ctl", "-D", "FOREGROUND"]
+```
