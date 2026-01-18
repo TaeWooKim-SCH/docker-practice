@@ -22,7 +22,7 @@ $ docker build 옵션 Dockerfile_경로
 - LABEL은 [key]=[value] 형식으로 메타 데이터들을 넣을 수 있는 기능
 - 보통 저자, 버전, 설명, 작성일자 등을 각각 key 이름을 정하고, 값을 넣는 경우가 있음
 
-```bash
+```dockerfile
 FROM httpd:alpine
 LABEL maintainer="zop1234@hanmail.net"
 LABEL version="1.0.0"
@@ -36,7 +36,7 @@ $ docker build --tag myweb .
 ```
 
 ## COPY
-```bash
+```dockerfile
 FROM httpd:alpine
 LABEL maintainer="zop1234@hanmail.net"
 LABEL version="1.0.0"
@@ -95,7 +95,8 @@ $ docker inspect myweb
 - CMD는 하나의 Dockerfile에서 한 가지만 설정되며, 만약 CMD 설정이 여러 개일 경우, 맨 마지막에 설정된 CMD 설정만 적용됨
 
 - httpd:alpine 기반 Dockerfile 작성하기
-```bash
+
+```dockerfile
 FROM httpd:alpine
 LABEL maintainer="zop1234@hanmail.net"
 LABEL version="1.0.0"
@@ -115,7 +116,7 @@ $ docker logs httpdweb
 
 - CMD 변경해보기
 
-```bash
+```dockerfile
 FROM httpd:alpine
 LABEL maintainer="zop1234@hanmail.net"
 LABEL version="1.0.0"
@@ -148,7 +149,7 @@ $ docker run -dit -p 9999:80 --name httpdweb2 --rm myweb2 /bin/sh -c httpd-foreg
 - CMD와 차이는 우선 순위가 ENTRYPOINT가 더 높음
 - CMD 명령에 덮어씌워지지 않기 위해 사용
 
-```bash
+```dockerfile
 FROM httpd:alpine
 
 LABEL maintainer="zop1234@hanmail.net"
@@ -176,4 +177,85 @@ RUN apt-get install -y apache2 apt-utils
 COPY ./2021_DEV_HTML /var/www/html/
 
 ENTRYPOINT ["usr/sbin/apache2ctl", "-D", "FOREGROUND"]
+```
+
+## EXPOSE
+- docker 컨테이너의 특정 포트를 외부에 오픈하는 설정
+  - docker run -p 옵션으로 설정할 수도 있음
+    - docker run -p 옵션은 컨테이너의 특정 포트를 외부에 오픈하고, 해당 포트를 호스트 PC의 특정 포트와 매핑시킴
+  - 이에 반해, EXPOSE는 컨테이너 생성시 특정 포트를 외부에 오픈하는 것만 설정하는 것
+    - 따라서 독립적으로 실행 시에는 EXPOSE 옵션을 넣는다고 해서 호스트 PC에서 해당 컨테이너에 포트 번호로 접속할 수 있는 것은 아님
+
+```dockerfile
+FROM ubuntu:18.04
+LABEL maintainer="zop1234@hanmail.net"
+
+RUN apt-get update
+RUN apt-get install -y apache2 apt-utils
+
+EXPOSE 80
+COPY ./2021_DEV_HTML /var/www/html/
+
+ENTRYPOINT ["/usr/sbin/apache2ctl", "-D", "FOREGROUND"]
+```
+
+```bash
+$ docker build --tag myweb -f Dockerfile_HTTPD5 ./
+```
+
+```bash
+$ dockr inspect myweb
+"Config": {
+  "ExposedPorts": {
+    "80/tcp": {}
+  }
+}
+```
+
+```bash
+# -P 옵션을 쓰면 EXPOSE로 오픈된 포트에 호스트 PC의 랜덤 포트가 매핑됨
+docker run -P -d myweb
+```
+
+
+## ENV
+- 컨테이너 내의 환경변수 설정
+- 설정한 환경변수는 RUN, CMD, ENTRYPOINT 명령에도 적용됨
+
+```dockerfile
+# Dockerfile_MYSQL
+FROM mysql:5.7
+
+# mysql 슈퍼 관리자인 root ID에 대한 password란에 원하는 패스워드 설정
+ENV MYSQL_ROOT_PASSWORD=password
+# dbname 란에 원하는 데이터베이스 이름 설정
+ENV MYSQL_DATABASE=mysqldb
+
+# 필요시 다음 설정도 가능
+# ENV MYSQL_USER=user # user 란에 mysql 추가 사용자 ID 설정
+# ENV MYSQL_PASSWORD=pw # pw 란에 mysql 추가 사용자 ID의 패스워드 설정
+```
+
+```bash
+# docker 이미지 작성하기
+$ docker build --tag mysqldb -f Dockerfile_MYSQL ./
+
+# docker 백그라운드 실행
+$ docker run -d --name mydb mysqldb
+
+# 컨테이너 접속해서 쉘 실행하기
+$ docker exec -it mydb /bin/bash
+
+# 이미지에서 설정한 패스워드 입력하기
+$ mysql -u root -p
+패스워드 입력
+
+# mysql 내부에서 db가 있음을 확인할 수 있음
+mysql> show database;
+
+# mysql 종료
+mysql> exit
+
+# 컨테이너 접속 종료
+exit
 ```
