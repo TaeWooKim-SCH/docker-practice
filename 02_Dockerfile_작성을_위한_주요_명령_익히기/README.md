@@ -167,7 +167,7 @@ ENTRYPOINT ["/bin/sh"]
 
 ### 예: ubuntu 18.04 버전에 apache2를 설치 후 나만의 웹 복사 후 웹서버 구동
 
-```bash
+```dockerfile
 FROM ubuntu:18.04
 LABEL maintainer="zop1234@hanmail.net"
 
